@@ -1,0 +1,8 @@
+{
+    "upload_defaults": {
+        "default_privacy": "public",
+        "default_category": "22",
+        "default_description": "",
+        "default_tags": []
+    }
+}
