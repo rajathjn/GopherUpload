@@ -26,3 +26,6 @@ go.work.sum
 .env
 client_secrets.json
 config.json
+
+# outputs
+outputs/
