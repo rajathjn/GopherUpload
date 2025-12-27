@@ -26,6 +26,7 @@ go.work.sum
 .env
 client_secrets.json
 config.json
+youtube-token.json
 
 # outputs
 outputs/
