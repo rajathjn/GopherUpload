@@ -156,3 +156,61 @@ func GetClient() (*oauth2.Token, error) {
 
 	return token, nil
 }
+
+// GetAuthenticatedClient returns an HTTP client with automatic token refresh capability.
+// The token will be automatically refreshed when it expires and saved for future use.
+func GetAuthenticatedClient() (*http.Client, error) {
+	config, err := loadClientConfig()
+	if err != nil {
+		return nil, err
+	}
+
+	oauthConfig := &oauth2.Config{
+		ClientID:     config.Installed.ClientID,
+		ClientSecret: config.Installed.ClientSecret,
+		RedirectURL:  "http://localhost",
+		Scopes: []string{
+			youtube.YoutubeUploadScope,
+			youtube.YoutubeReadonlyScope,
+		},
+		Endpoint: google.Endpoint,
+	}
+
+	token, err := GetClient()
+	if err != nil {
+		return nil, err
+	}
+
+	// Create a token source that automatically refreshes the token
+	ctx := context.Background()
+	tokenSource := oauthConfig.TokenSource(ctx, token)
+
+	// Wrap with ReuseTokenSource to cache the token and only refresh when needed
+	// This also allows us to save the new token when it's refreshed
+	reusableTokenSource := oauth2.ReuseTokenSource(token, &savingTokenSource{
+		tokenSource: tokenSource,
+	})
+
+	return oauth2.NewClient(ctx, reusableTokenSource), nil
+}
+
+// savingTokenSource wraps a token source and saves new tokens to disk
+type savingTokenSource struct {
+	tokenSource oauth2.TokenSource
+}
+
+// Token returns a token, saving it to disk if it's a new one
+func (s *savingTokenSource) Token() (*oauth2.Token, error) {
+	token, err := s.tokenSource.Token()
+	if err != nil {
+		return nil, err
+	}
+
+	// Save the potentially refreshed token
+	if err := saveToken(token); err != nil {
+		// Log the error but don't fail - we still have a valid token
+		fmt.Printf("Warning: could not save refreshed token: %v\n", err)
+	}
+
+	return token, nil
+}
