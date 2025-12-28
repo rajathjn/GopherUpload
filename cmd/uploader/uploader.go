@@ -14,7 +14,6 @@ import (
 	"github.com/charmbracelet/lipgloss"
 	"github.com/rajathjn/gopherupload/cmd/auth"
 	"github.com/rajathjn/gopherupload/cmd/config"
-	"golang.org/x/oauth2"
 	"google.golang.org/api/option"
 	"google.golang.org/api/youtube/v3"
 )
@@ -211,15 +210,13 @@ func parseSchedule(dateStr, timeStr string) (time.Time, error) {
 
 // UploadVideo uploads a video to YouTube with the given metadata and optional thumbnail.
 func UploadVideo(videoPath, thumbnailPath string, metadata *UploadMetadata) error {
-	// Get authentication token
-	token, err := auth.GetClient()
+	// Get authentication token with auto-refresh capability
+	client, err := auth.GetAuthenticatedClient()
 	if err != nil {
 		return fmt.Errorf("authentication error: %v", err)
 	}
 
 	ctx := context.Background()
-	tokenSource := oauth2.StaticTokenSource(token)
-	client := oauth2.NewClient(ctx, tokenSource)
 
 	// Create YouTube service
 	service, err := youtube.NewService(ctx, option.WithHTTPClient(client))
