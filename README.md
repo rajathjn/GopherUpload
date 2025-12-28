@@ -1,6 +1,10 @@
 # GopherUpload
 
 <p align="center">
+  <img src="gopher.png" alt="gopher" width="150" height="150">
+</p>
+
+<p align="center">
   <b>A simple CLI-based YouTube Video Uploader 🎬 ⬆️ 🚀</b>
 </p>
 
