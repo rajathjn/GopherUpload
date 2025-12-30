@@ -120,7 +120,8 @@ func loadClientConfig() (*ClientConfig, error) {
 		return nil, fmt.Errorf("error reading configuration file: %v", err)
 	}
 
-	if err := json.Unmarshal(data, config); err != nil {
+	err = json.Unmarshal(data, config)
+	if err != nil {
 		return nil, fmt.Errorf("error parsing configuration: %v", err)
 	}
 
@@ -150,7 +151,8 @@ func GetClient() (*oauth2.Token, error) {
 	}
 
 	token := &oauth2.Token{}
-	if err := json.Unmarshal(data, token); err != nil {
+	err = json.Unmarshal(data, token)
+	if err != nil {
 		return nil, fmt.Errorf("error reading token: %v", err)
 	}
 
